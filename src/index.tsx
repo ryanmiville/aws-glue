@@ -1,11 +1,16 @@
 import { GetJobsCommand, GlueClient, Job, StartJobRunCommand, WorkerType } from "@aws-sdk/client-glue";
 import { Action, ActionPanel, Form, Icon, List, Toast, popToRoot, showToast } from "@raycast/api";
 import { useCachedPromise, useForm } from "@raycast/utils";
+import AWSProfileDropdown from "./aws-profile-dropdown";
 
 export default function Command() {
-  const { data: jobs, error, isLoading } = useCachedPromise(fetchJobs);
+  const { data: jobs, error, isLoading, revalidate } = useCachedPromise(fetchJobs);
   return (
-    <List isLoading={isLoading} searchBarPlaceholder="Filter jobs by name...">
+    <List
+      isLoading={isLoading}
+      searchBarPlaceholder="Filter jobs by name..."
+      searchBarAccessory={<AWSProfileDropdown onProfileSelected={revalidate} />}
+    >
       {error ? (
         <List.EmptyView title={error.name} description={error.message} icon={Icon.Warning} />
       ) : (

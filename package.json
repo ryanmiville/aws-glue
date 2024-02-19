@@ -20,7 +20,8 @@
   "dependencies": {
     "@aws-sdk/client-glue": "^3.515.0",
     "@raycast/api": "^1.67.1",
-    "@raycast/utils": "^1.12.4"
+    "@raycast/utils": "^1.12.4",
+    "@smithy/shared-ini-file-loader": "^2.3.1"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.6",
