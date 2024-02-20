@@ -1,5 +1,5 @@
 import { GetJobsCommand, GlueClient, Job, StartJobRunCommand, WorkerType } from "@aws-sdk/client-glue";
-import { Action, ActionPanel, Form, Icon, List, Toast, popToRoot, showToast } from "@raycast/api";
+import { Action, ActionPanel, Form, Icon, List, Toast, showToast } from "@raycast/api";
 import { useCachedPromise, useForm } from "@raycast/utils";
 import AWSProfileDropdown from "./aws-profile-dropdown";
 
@@ -55,7 +55,6 @@ function RunJob({ job }: { job: Job }) {
   const { handleSubmit, itemProps } = useForm<RunJobFormValues>({
     onSubmit(values) {
       submit(jobName!, values);
-      popToRoot({ clearSearchBar: true });
       showToast({
         style: Toast.Style.Success,
         title: "Job Started",
@@ -96,6 +95,10 @@ function RunJob({ job }: { job: Job }) {
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Start Job" onSubmit={handleSubmit} />
+          <Action.OpenInBrowser
+            title="Open in Console"
+            url={`https://us-east-1.console.aws.amazon.com/gluestudio/home?region=us-east-1#/editor/job/${job.Name}/runs`}
+          />
         </ActionPanel>
       }
     >
