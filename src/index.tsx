@@ -1,4 +1,4 @@
-import { GetJobsCommand, GlueClient, Job, StartJobRunCommand, WorkerType } from "@aws-sdk/client-glue";
+import { GetJobsCommand, GlueClient, type Job, StartJobRunCommand, WorkerType } from "@aws-sdk/client-glue";
 import { Action, ActionPanel, Form, Icon, List, Toast, showToast } from "@raycast/api";
 import { useCachedPromise, useForm } from "@raycast/utils";
 import AWSProfileDropdown from "./aws-profile-dropdown";
@@ -123,10 +123,10 @@ async function submit(jobName: string, values: RunJobFormValues) {
   const argsObject: Record<string, string> = {};
   if (values.args) {
     const lines = values.args.split("\n");
-    lines.forEach((line) => {
+    for (const line of lines) {
       const [key, value] = line.split(" ");
       argsObject[key] = value;
-    });
+    }
   }
 
   await startJob({

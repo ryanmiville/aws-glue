@@ -18,7 +18,7 @@ export default function AWSProfileDropdown({ onProfileSelected }: Props) {
     if (!selectedProfile || isSelectedProfileInvalid) {
       setSelectedProfile(profileOptions[0]?.name);
     }
-  }, [profileOptions]);
+  }, [profileOptions, selectedProfile, setSelectedProfile]);
 
   useEffect(() => {
     if (selectedProfile) {
@@ -32,7 +32,7 @@ export default function AWSProfileDropdown({ onProfileSelected }: Props) {
     }
 
     onProfileSelected?.();
-  }, [selectedProfile]);
+  }, [selectedProfile, onProfileSelected, profileOptions.find]);
 
   if (!profileOptions || profileOptions.length < 2) {
     return null;
