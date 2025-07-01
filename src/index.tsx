@@ -115,8 +115,23 @@ function RunJob({ job }: { job: Job }) {
 
 async function fetchJobs() {
   const client = new GlueClient({});
-  const { Jobs } = await client.send(new GetJobsCommand({}));
-  return Jobs;
+  const allJobs: Job[] = [];
+  let nextToken: string | undefined;
+
+  do {
+    const response = await client.send(new GetJobsCommand({
+      NextToken: nextToken,
+      MaxResults: 100,
+    }));
+    
+    if (response.Jobs) {
+      allJobs.push(...response.Jobs);
+    }
+    
+    nextToken = response.NextToken;
+  } while (nextToken);
+
+  return allJobs;
 }
 
 async function submit(jobName: string, values: RunJobFormValues) {
