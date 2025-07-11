@@ -21,7 +21,8 @@
     "@aws-sdk/client-glue": "^3.515.0",
     "@raycast/api": "^1.67.1",
     "@raycast/utils": "^1.12.4",
-    "@smithy/shared-ini-file-loader": "^2.3.1"
+    "@smithy/shared-ini-file-loader": "^2.3.1",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.6",
@@ -29,7 +30,8 @@
     "@types/react": "18.2.27",
     "eslint": "^8.51.0",
     "prettier": "^3.0.3",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "@types/bun": "latest"
   },
   "scripts": {
     "build": "ray build -e dist",
@@ -37,5 +39,8 @@
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
     "publish": "npx @raycast/api@latest publish"
-  }
+  },
+  "module": "src/index.tsx",
+  "type": "module",
+  "private": true
 }

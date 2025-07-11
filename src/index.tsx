@@ -1,6 +1,7 @@
 import { GetJobsCommand, GlueClient, type Job, StartJobRunCommand, WorkerType } from "@aws-sdk/client-glue";
 import { Action, ActionPanel, Form, Icon, List, Toast, showToast } from "@raycast/api";
 import { useCachedPromise, useForm } from "@raycast/utils";
+import { z } from "zod";
 import AWSProfileDropdown from "./aws-profile-dropdown";
 
 export default function Command() {
@@ -39,9 +40,11 @@ function GlueJob({ job }: { job: Job }) {
   );
 }
 
-const ARGS = `--arg1 value1
---arg2 value2
---arg3 value3`;
+const ARGS = `{
+  "--arg1": "value1",
+  "--arg2": "value2",
+  "--arg3": "value3"
+}`;
 
 interface RunJobFormValues {
   workerType: string;
@@ -77,12 +80,21 @@ function RunJob({ job }: { job: Job }) {
         }
       },
       args: (value) => {
-        if (value) {
-          const lines = value.split("\n");
-          const args = lines.map((line) => line.split(" ")[0]);
-          const dashes = args.filter((arg) => !arg.startsWith("--"));
-          if (dashes.length) {
-            return `Arguments must start with --, found: ${dashes.join(", ")}`;
+        if (value && value.trim()) {
+          try {
+            const parsed = JSON.parse(value);
+            const argsSchema = z.record(z.string(), z.string());
+            const result = argsSchema.safeParse(parsed);
+            if (!result.success) {
+              return "Arguments must be a valid JSON object with string keys and values";
+            }
+            // Validate that all keys start with --
+            const invalidKeys = Object.keys(parsed).filter(key => !key.startsWith("--"));
+            if (invalidKeys.length > 0) {
+              return `All argument keys must start with --, found: ${invalidKeys.join(", ")}`;
+            }
+          } catch (error) {
+            return "Arguments must be valid JSON";
           }
         }
       },
@@ -119,15 +131,17 @@ async function fetchJobs() {
   let nextToken: string | undefined;
 
   do {
-    const response = await client.send(new GetJobsCommand({
-      NextToken: nextToken,
-      MaxResults: 100,
-    }));
-    
+    const response = await client.send(
+      new GetJobsCommand({
+        NextToken: nextToken,
+        MaxResults: 100,
+      }),
+    );
+
     if (response.Jobs) {
       allJobs.push(...response.Jobs);
     }
-    
+
     nextToken = response.NextToken;
   } while (nextToken);
 
@@ -135,12 +149,13 @@ async function fetchJobs() {
 }
 
 async function submit(jobName: string, values: RunJobFormValues) {
-  const argsObject: Record<string, string> = {};
-  if (values.args) {
-    const lines = values.args.split("\n");
-    for (const line of lines) {
-      const [key, value] = line.split(" ");
-      argsObject[key] = value;
+  let argsObject: Record<string, string> = {};
+  if (values.args && values.args.trim()) {
+    try {
+      argsObject = JSON.parse(values.args);
+    } catch (error) {
+      // This shouldn't happen due to form validation, but handle it gracefully
+      console.error("Failed to parse arguments JSON:", error);
     }
   }
 
