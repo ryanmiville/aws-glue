@@ -89,7 +89,7 @@ function RunJob({ job }: { job: Job }) {
               return "Arguments must be a valid JSON object with string keys and values";
             }
             // Validate that all keys start with --
-            const invalidKeys = Object.keys(parsed).filter(key => !key.startsWith("--"));
+            const invalidKeys = Object.keys(parsed).filter((key) => !key.startsWith("--"));
             if (invalidKeys.length > 0) {
               return `All argument keys must start with --, found: ${invalidKeys.join(", ")}`;
             }
